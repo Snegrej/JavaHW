@@ -27,7 +27,7 @@ public class Ladder {
     public void readInput(Scanner in){
         h = in.nextInt();
         v = in.nextInt();
-        if(h <= 1 || h >= 10_000){
+        if(h <= 1 || h >= 10000){
             throw new IllegalStateException("invalid value of h: " +h);
         }
         if(v <= 1 || v >= 89){
