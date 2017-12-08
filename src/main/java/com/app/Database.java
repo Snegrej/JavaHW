@@ -105,7 +105,7 @@ public class Database
 
     void run() throws SQLException, FileNotFoundException{
       reset();
-      readData("example.dat");
+      readData("sensorData.dat");
       printAllData();
       //selectByDate("2017-12-07");
     }
