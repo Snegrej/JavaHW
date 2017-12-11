@@ -1,2 +1,2 @@
 # AdvancedJava
-Teague Van Pelt's Homework for Advanced Programming Java TR: 10:30
+Teague Van Pelt's final project: Snake
