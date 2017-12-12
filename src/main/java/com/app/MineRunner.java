@@ -20,8 +20,9 @@ public class MineRunner extends JPanel implements ActionListener{
     //Size of blocks (pixels)
     private int blockDimensions = 15;
 
-    private int numRows = 31;
-    private int numColumns = 31;
+    private final int numRows = 31;
+    private final int numColumns = 31;
+    private final int maxBlocks = numRows*numColumns;
 
 
     private int[][] grid; //Game board
@@ -72,7 +73,7 @@ public class MineRunner extends JPanel implements ActionListener{
       playing = true;
       score = 0;
       grid = new int[numRows][numColumns];
-      snake = new Coord[10];//Init Snake decay array
+      snake = new Coord[maxBlocks];//Init Snake decay array
       tail = 0;
       for (int x = 0; x < numRows; x++) {
           for (int y = 0; y < numColumns; y++) {
@@ -154,12 +155,10 @@ public class MineRunner extends JPanel implements ActionListener{
           }else playing = false;
         }else playing = false;
       }
-      if(tail+1<10){
-        snake[tail+1]=head;
+      if(tail+score<maxBlocks){
+        snake[tail+score]=head;
       }else{
-        snake[1]=head;
-        snake[0]=snake[tail];
-        tail = 0;
+        snake[tail+score-maxBlocks] = head;
       }
     }
 
@@ -169,7 +168,12 @@ public class MineRunner extends JPanel implements ActionListener{
           int column = snake[tail].column_Coord;
           grid[row][column] = 0;
           if(score!=0){
-            if(tail<numRows*numColumns)tail++;
+            if(tail<maxBlocks){
+              tail++;
+            }else{
+              System.out.println("tail set to 0");
+              tail = 0;
+            }
           }
         }
     }
