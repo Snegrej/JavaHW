@@ -16,7 +16,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
-public class Snake extends JPanel implements ActionListener{
+public class MineRunner extends JPanel implements ActionListener{
     //Size of blocks (pixels)
     private int blockDimensions = 15;
 
@@ -34,7 +34,7 @@ public class Snake extends JPanel implements ActionListener{
     private Image[] img;
     private JLabel infoPanel;
     private Timer timer;
-    private final static int speed = 60; //gamespeed
+    private final static int speed = 70; //gamespeed
 
     private boolean up = false;
     private boolean down = false;
@@ -56,14 +56,14 @@ public class Snake extends JPanel implements ActionListener{
       }
     }
 
-    public Snake(JLabel infoPanel) throws InterruptedException{
+    public MineRunner(JLabel infoPanel) throws InterruptedException{
       this.infoPanel = infoPanel;
       img = new Image[3];
       for (int i = 0; i < 3; i++) {
           img[i] = (new ImageIcon("src/main/resources/imageFiles/" + i + ".png")).getImage();
       }
       timer = new Timer(speed,this);
-      addKeyListener(new SnakeAdapter());
+      addKeyListener(new MineRunnerAdapter());
       setFocusable(true);
       newGame();
     }
@@ -72,7 +72,7 @@ public class Snake extends JPanel implements ActionListener{
       playing = true;
       score = 0;
       grid = new int[numRows][numColumns];
-      snake = new Coord[numRows*numColumns];//Init Snake decay array
+      snake = new Coord[10];//Init Snake decay array
       tail = 0;
       for (int x = 0; x < numRows; x++) {
           for (int y = 0; y < numColumns; y++) {
@@ -84,7 +84,7 @@ public class Snake extends JPanel implements ActionListener{
       head = snake[0];
       infoPanel.setText("Score:" + Integer.toString(score));
       timer.start();
-      spawnApple();
+      spawnMine();
     }
 
     @Override
@@ -105,8 +105,9 @@ public class Snake extends JPanel implements ActionListener{
         if(!eaten){
           decrTail();
         }else{
-          spawnApple();
+          spawnMine();
           score++;
+          infoPanel.setText("Score:" + Integer.toString(score));
           eaten = false;
         }
         moveHead();
@@ -137,7 +138,7 @@ public class Snake extends JPanel implements ActionListener{
       }
       if(up){
         head.row_Coord--;
-        if(head.row_Coord>0){
+        if(head.row_Coord>=0){
           if(grid[head.row_Coord][head.column_Coord]!=1){
             if(grid[head.row_Coord][head.column_Coord]==2) eaten=true;
             grid[head.row_Coord][head.column_Coord] = 1;
@@ -153,7 +154,13 @@ public class Snake extends JPanel implements ActionListener{
           }else playing = false;
         }else playing = false;
       }
-      if(tail+1<numRows*numColumns) snake[tail+1]=head;
+      if(tail+1<10){
+        snake[tail+1]=head;
+      }else{
+        snake[1]=head;
+        snake[0]=snake[tail];
+        tail = 0;
+      }
     }
 
     public void decrTail(){
@@ -166,7 +173,7 @@ public class Snake extends JPanel implements ActionListener{
           }
         }
     }
-    public void spawnApple(){
+    public void spawnMine(){
       int n1, n2;
       Random random = new Random();
       n1 = random.nextInt(numRows);
@@ -178,14 +185,14 @@ public class Snake extends JPanel implements ActionListener{
       grid[n1][n2] = 2;
     }
 
-    public class SnakeAdapter extends KeyAdapter{
+    public class MineRunnerAdapter extends KeyAdapter{
       @Override
       public void keyPressed(KeyEvent event) {
         if(!playing){
             try {
                 newGame();
             } catch (InterruptedException ex) {
-                Logger.getLogger(Snake.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(MineRunner.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
           switch (event.getKeyCode()) {

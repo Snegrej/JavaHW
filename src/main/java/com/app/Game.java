@@ -18,12 +18,12 @@ public class Game extends JFrame {
         //setSize(250, 290);
         setSize(465,505);
         setLocationRelativeTo(null);
-        setTitle("Snake");
+        setTitle("Mine Runner");
 
         statusbar = new JLabel("");
         add(statusbar, BorderLayout.SOUTH);
 
-        add(new Snake(statusbar));
+        add(new MineRunner(statusbar));
 
         setResizable(false);
     }
