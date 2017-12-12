@@ -1,6 +1,8 @@
 package com.app;
 
 import java.awt.BorderLayout;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
@@ -10,11 +12,11 @@ public class Game extends JFrame {
 
     private JLabel statusbar;
 
-    public Game() {
+    public Game() throws InterruptedException {
 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         //setSize(250, 290);
-        setSize(450,490);
+        setSize(465,505);
         setLocationRelativeTo(null);
         setTitle("Snake");
 
@@ -31,8 +33,14 @@ public class Game extends JFrame {
 
             @Override
             public void run() {
-                JFrame ex = new Game();
-                ex.setVisible(true);
+                JFrame ex;
+                try {
+                    ex = new Game();
+                    ex.setVisible(true);
+                } catch (InterruptedException ex1) {
+                    Logger.getLogger(Game.class.getName()).log(Level.SEVERE, null, ex1);
+                }
+
             }
         });
     }
