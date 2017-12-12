@@ -9,6 +9,8 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -32,12 +34,13 @@ public class Snake extends JPanel implements ActionListener{
     private Image[] img;
     private JLabel infoPanel;
     private Timer timer;
-    private static int speed = 60; //gamespeed
+    private final static int speed = 60; //gamespeed
 
     private boolean up = false;
     private boolean down = false;
-    private boolean left = true;
+    private boolean left = false;
     private boolean right = false;
+    private boolean eaten = false;
 
 
     class Coord{
@@ -54,19 +57,18 @@ public class Snake extends JPanel implements ActionListener{
     }
 
     public Snake(JLabel infoPanel) throws InterruptedException{
-      System.out.println("Snake call");
       this.infoPanel = infoPanel;
       img = new Image[3];
       for (int i = 0; i < 3; i++) {
           img[i] = (new ImageIcon("src/main/resources/imageFiles/" + i + ".png")).getImage();
       }
+      timer = new Timer(speed,this);
       addKeyListener(new SnakeAdapter());
       setFocusable(true);
       newGame();
     }
 
     private void newGame() throws InterruptedException{
-      System.out.println("newGame call");
       playing = true;
       score = 0;
       grid = new int[numRows][numColumns];
@@ -81,13 +83,12 @@ public class Snake extends JPanel implements ActionListener{
       snake[tail] = new Coord(numRows/2,numColumns/2); //Create Snake decay array
       head = snake[0];
       infoPanel.setText("Score:" + Integer.toString(score));
-      timer = new Timer(speed,this);
       timer.start();
+      spawnApple();
     }
 
     @Override
     public void paintComponent(Graphics g) {
-      System.out.println("paintComponent call");
       int block;
       for (int row = 0; row < numRows; row++) {
           for (int column = 0; column < numColumns; column++) {
@@ -101,28 +102,35 @@ public class Snake extends JPanel implements ActionListener{
     @Override
     public void actionPerformed(ActionEvent e) {
       if (playing == true) {
-        decrTail();
+        if(!eaten){
+          decrTail();
+        }else{
+          spawnApple();
+          score++;
+          eaten = false;
+        }
         moveHead();
         repaint();
+      }else{
+        timer.stop();
       }
-    // Repaint or 'render' our screen
 }
 
     public void moveHead(){
-        System.out.println("head call");
       if(right){
         head.column_Coord++;
         if(head.column_Coord<numColumns){
           if(grid[head.row_Coord][head.column_Coord]!=1){
+            if(grid[head.row_Coord][head.column_Coord]==2) eaten=true;
             grid[head.row_Coord][head.column_Coord] = 1;
           }else playing = false;
         }else playing = false;
-        System.out.println(head.row_Coord + " , " + head.column_Coord);
       }
       if(left){
         head.column_Coord--;
-        if(head.column_Coord>0){
+        if(head.column_Coord>=0){
           if(grid[head.row_Coord][head.column_Coord]!=1){
+            if(grid[head.row_Coord][head.column_Coord]==2) eaten=true;
             grid[head.row_Coord][head.column_Coord] = 1;
           }else playing = false;
         }else playing = false;
@@ -131,6 +139,7 @@ public class Snake extends JPanel implements ActionListener{
         head.row_Coord--;
         if(head.row_Coord>0){
           if(grid[head.row_Coord][head.column_Coord]!=1){
+            if(grid[head.row_Coord][head.column_Coord]==2) eaten=true;
             grid[head.row_Coord][head.column_Coord] = 1;
           }else playing = false;
         }else playing = false;
@@ -139,16 +148,15 @@ public class Snake extends JPanel implements ActionListener{
         head.row_Coord++;
         if(head.row_Coord<numRows){
           if(grid[head.row_Coord][head.column_Coord]!=1){
+            if(grid[head.row_Coord][head.column_Coord]==2) eaten=true;
             grid[head.row_Coord][head.column_Coord] = 1;
           }else playing = false;
         }else playing = false;
       }
-      System.out.println("");
       if(tail+1<numRows*numColumns) snake[tail+1]=head;
     }
 
     public void decrTail(){
-        System.out.println("decrTail call");
         if(playing){
           int row = snake[tail].row_Coord;
           int column = snake[tail].column_Coord;
@@ -158,12 +166,28 @@ public class Snake extends JPanel implements ActionListener{
           }
         }
     }
-    public void checkGameState(){
+    public void spawnApple(){
+      int n1, n2;
+      Random random = new Random();
+      n1 = random.nextInt(numRows);
+      n2 = random.nextInt(numColumns);
+      while(grid[n1][n2]==1){
+        n1 = random.nextInt(numRows);
+        n2 = random.nextInt(numColumns);
+      }
+      grid[n1][n2] = 2;
     }
 
     public class SnakeAdapter extends KeyAdapter{
       @Override
       public void keyPressed(KeyEvent event) {
+        if(!playing){
+            try {
+                newGame();
+            } catch (InterruptedException ex) {
+                Logger.getLogger(Snake.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
           switch (event.getKeyCode()) {
               case KeyEvent.VK_LEFT:
                   left = true;
